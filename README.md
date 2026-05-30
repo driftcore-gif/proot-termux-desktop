@@ -154,14 +154,14 @@ Installer will ask:
 
 ### 3. Install proot distro
 ```bash
-proot-distro install $DISTRO
+proot-distro install debian
 ```
 
 ### 4. Run proot setup (inside proot)
 ```bash
-proot-distro login $DISTRO --shared-tmp
-bash -c~/desktop/setup/$DISTRO-setup.sh
-``
+proot-distro login debian --shared-tmp
+bash ~/desktop/setup/debian-setup.sh
+```
 
 Proot setup will ask:
 - 🖥️ DE — XFCE / KDE / GNOME / MATE / LXQt / Openbox / i3wm / Cinnamon

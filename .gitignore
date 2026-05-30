@@ -1,0 +1,6 @@
+*.log
+*.bak
+.wine/
+.cache/
+.DS_Store
+*.tmp

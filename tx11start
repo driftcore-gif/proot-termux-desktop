@@ -19,7 +19,7 @@ dialog --title "Proot-termux-desktop v0.40" \
 # ─────────────────────────────────────────────
 dialog --title "Installing" --infobox "\nInstalling Termux packages...\n\nPlease wait." 7 40
 pkg update -y > /dev/null 2>&1
-pkg install -y root-repo x11-repo tur-repo proot-distro termux-x11-nightly virglrenderer-android pulseaudio wget curl > /dev/null 2>&1
+pkg install -y proot-distro termux-x11-nightly virglrenderer-android pulseaudio wget curl git > /dev/null 2>&1
 
 # ─────────────────────────────────────────────
 # Select distro
