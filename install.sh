@@ -1,7 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# install.sh — Termux side setup with dialog TUI
+# install.sh — Full Termux setup with dialog TUI
 
-# Install dialog first
 pkg install -y dialog 2>/dev/null
 
 TERMUX_BIN="/data/data/com.termux/files/usr/bin"
@@ -12,62 +11,105 @@ TMP=$(mktemp)
 # Welcome
 # ─────────────────────────────────────────────
 dialog --title "Proot-termux-desktop v0.40" \
-  --msgbox "\nWelcome to Proot-termux-desktop!\n\nThis will install:\n  - Termux dependencies\n  - proot-distro\n  - tx11start launcher\n\nApp installation happens inside proot." 14 50
-
-# ─────────────────────────────────────────────
-# Install Termux packages
-# ─────────────────────────────────────────────
-dialog --title "Installing" --infobox "\nInstalling Termux packages...\n\nPlease wait." 7 40
-pkg update -y > /dev/null 2>&1
-pkg install -y root-repo x11-repo tur-repo proot-distro termux-x11-nightly virglrenderer-android pulseaudio wget curl > /dev/null 2>&1
+  --msgbox "\nWelcome to Proot-termux-desktop!\n\nThis installer will:\n\n  1. Enable x11-repo + root-repo\n  2. Update package lists\n  3. Install all Termux packages\n  4. Install selected proot distro\n  5. Generate tx11start\n  6. Auto-launch proot setup\n\nPress OK to begin." 18 52
 
 # ─────────────────────────────────────────────
 # Select distro
 # ─────────────────────────────────────────────
 dialog --title "Select Distro" \
-  --menu "\nChoose Linux distribution to install:" 16 55 5 \
-  "debian"     "✅ Debian      — Most stable, recommended" \
-  "ubuntu"     "✅ Ubuntu      — Good compatibility" \
-  "archlinux"  "⚡ Arch Linux  — Cutting edge" \
-  "fedora"     "⚠️  Fedora      — Heavier" \
-  "void"       "🚫 Void        — Not tested" \
+  --menu "\nChoose Linux distribution:" 16 58 5 \
+  "debian"    "✅ Debian      — Most stable, recommended" \
+  "ubuntu"    "✅ Ubuntu      — Good compatibility" \
+  "archlinux" "⚡ Arch Linux  — Cutting edge" \
+  "fedora"    "⚠️  Fedora      — Heavier" \
+  "void"      "🚫 Void        — Not tested" \
   2>"$TMP"
 
 DISTRO=$(cat "$TMP")
-[[ -z "$DISTRO" ]] && dialog --msgbox "Cancelled." 5 20 && rm -f "$TMP" && exit 0
+[[ -z "$DISTRO" ]] && clear && exit 0
 
 # ─────────────────────────────────────────────
-# Select connection type
+# Select connection
 # ─────────────────────────────────────────────
 dialog --title "Connection Type" \
-  --menu "\nChoose display connection type:" 12 55 2 \
+  --menu "\nChoose display connection type:" 12 56 2 \
   "tx11" "Termux:X11 — Fast, low latency (recommended)" \
   "vnc"  "VNC        — Remote capable, flexible" \
   2>"$TMP"
 
 CONNECTION=$(cat "$TMP")
-[[ -z "$CONNECTION" ]] && dialog --msgbox "Cancelled." 5 20 && rm -f "$TMP" && exit 0
-
-[[ "$CONNECTION" == "vnc" ]] && pkg install -y tigervnc > /dev/null 2>&1
+[[ -z "$CONNECTION" ]] && clear && exit 0
 
 # ─────────────────────────────────────────────
 # Confirm
 # ─────────────────────────────────────────────
-dialog --title "Confirm" \
-  --yesno "\nConfiguration:\n\n  Distro     : $DISTRO\n  Connection : $CONNECTION\n\nProceed?" 12 45
+dialog --title "Confirm Setup" \
+  --yesno "\nConfiguration:\n\n  Distro     : $DISTRO\n  Connection : $CONNECTION\n\nProceed?" 12 48
 
-[[ $? -ne 0 ]] && dialog --msgbox "Aborted." 5 20 && rm -f "$TMP" && exit 0
-
-# ─────────────────────────────────────────────
-# Install proot distro
-# ─────────────────────────────────────────────
-dialog --title "Installing" --infobox "\nInstalling $DISTRO proot...\n\nThis may take a while." 8 45
-proot-distro install "$DISTRO" > /dev/null 2>&1 || true
+[[ $? -ne 0 ]] && clear && exit 0
+clear
 
 # ─────────────────────────────────────────────
-# Generate tx11start
+# Step 1 — Enable repos FIRST then update
 # ─────────────────────────────────────────────
-dialog --title "Generating" --infobox "\nGenerating tx11start..." 6 40
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Step 1/5 — Enabling repos"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "📦 Installing x11-repo..."
+pkg install -y x11-repo
+echo "📦 Installing root-repo..."
+pkg install -y root-repo
+echo "📦 Updating package lists..."
+pkg update -y
+echo "✅ Repos enabled and updated"
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 2 — Install all packages
+# ─────────────────────────────────────────────
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Step 2/5 — Installing Termux packages"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+echo "📦 Installing proot-distro..."
+pkg install -y proot-distro
+
+echo "📦 Installing termux-x11-nightly..."
+pkg install -y termux-x11-nightly
+
+echo "📦 Installing virglrenderer-android..."
+pkg install -y virglrenderer-android
+
+echo "📦 Installing pulseaudio..."
+pkg install -y pulseaudio
+
+echo "📦 Installing wget curl git..."
+pkg install -y wget curl git
+
+if [[ "$CONNECTION" == "vnc" ]]; then
+  echo "📦 Installing tigervnc..."
+  pkg install -y tigervnc
+fi
+
+echo "✅ All Termux packages installed"
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 3 — Install proot distro
+# ─────────────────────────────────────────────
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Step 3/5 — Installing $DISTRO proot"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+proot-distro install "$DISTRO" || echo "⚠️ Already installed or failed"
+echo "✅ $DISTRO ready"
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 4 — Generate tx11start
+# ─────────────────────────────────────────────
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Step 4/5 — Generating tx11start"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 cat > "$TX11_BIN" << SCRIPT
 #!/data/data/com.termux/files/usr/bin/bash
@@ -135,11 +177,15 @@ sleep 1
 
 echo "🎙️ Audio..."
 pulseaudio --kill 2>/dev/null; sleep 1
-pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
+pulseaudio --start \
+  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
   --load="module-sles-source" --exit-idle-time=-1 2>/dev/null || \
-pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
+pulseaudio --start \
+  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
   --load="module-aaudio-source" --exit-idle-time=-1 2>/dev/null || \
-pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --exit-idle-time=-1 2>/dev/null
+pulseaudio --start \
+  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
+  --exit-idle-time=-1 2>/dev/null
 sleep 1
 
 if [[ "\$CONNECTION" == "tx11" ]]; then
@@ -188,12 +234,33 @@ proot-distro login "\$DISTRO" --shared-tmp -- bash -c "
 SCRIPT
 
 chmod +x "$TX11_BIN"
+echo "✅ tx11start installed to $TX11_BIN"
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 5 — Auto-login proot
+# ─────────────────────────────────────────────
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Step 5/5 — Launching $DISTRO proot"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🐧 Auto-logging into $DISTRO..."
+echo "📦 Will run: ~/desktop/setup/${DISTRO}-setup.sh"
+echo ""
+sleep 2
+
 rm -f "$TMP"
 
-# ─────────────────────────────────────────────
-# Done
-# ─────────────────────────────────────────────
-dialog --title "✅ Done!" \
-  --msgbox "\nTermux setup complete!\n\nNext steps:\n\n  1. proot-distro login $DISTRO --shared-tmp\n\n  2. bash ~/desktop/setup/${DISTRO}-setup.sh\n\n  3. exit\n\n  4. tx11start" 18 55
+proot-distro login "$DISTRO" --shared-tmp -- bash -c "
+  if [ -f ~/desktop/setup/${DISTRO}-setup.sh ]; then
+    bash ~/desktop/setup/${DISTRO}-setup.sh
+  else
+    echo '⚠️  Setup file not found!'
+    echo '👉 Clone repo first:'
+    echo '   git clone https://github.com/driftcore-gif/Debian-termux-desktop.git ~/desktop'
+    echo '   bash ~/desktop/install.sh'
+    bash
+  fi
+"
 
-clear
+echo ""
+echo "✅ All done! Run: tx11start"
