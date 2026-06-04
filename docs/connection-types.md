@@ -1,2 +1,1 @@
-# connection-types
-See README.md for full documentation.
+# connection-types — See README.md

@@ -1,2 +1,1 @@
-# apps
-See README.md for full documentation.
+# apps — See README.md

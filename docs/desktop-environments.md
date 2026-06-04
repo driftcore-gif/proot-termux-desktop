@@ -1,2 +1,1 @@
-# desktop-environments
-See README.md for full documentation.
+# desktop-environments — See README.md

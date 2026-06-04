@@ -1,2 +1,1 @@
-# gpu-acceleration
-See README.md for full documentation.
+# gpu-acceleration — See README.md

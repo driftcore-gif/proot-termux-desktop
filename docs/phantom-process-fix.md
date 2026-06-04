@@ -1,2 +1,1 @@
-# phantom-process-fix
-See README.md for full documentation.
+# phantom-process-fix — See README.md
