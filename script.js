@@ -1,19 +1,100 @@
-```javascript
-document.addEventListener("DOMContentLoaded", () => {
+:root{
+    --bg:#0f1117;
+    --surface:#1a1d26;
+    --primary:#7c9cff;
+    --text:#ffffff;
+    --secondary:#a8b3cf;
+}
 
-    console.log("proot-termux-desktop loaded");
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-    const cards = document.querySelectorAll(".card");
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui,sans-serif;
+}
 
-    cards.forEach(card => {
-        card.addEventListener("mouseenter", () => {
-            card.style.scale = "1.02";
-        });
+.navbar{
+    padding:20px;
+    text-align:center;
+    background:var(--surface);
+}
 
-        card.addEventListener("mouseleave", () => {
-            card.style.scale = "1";
-        });
-    });
+.hero{
+    text-align:center;
+    padding:120px 20px;
+}
 
-});
+.hero h1{
+    font-size:3rem;
+    margin-bottom:20px;
+}
+
+.hero p{
+    max-width:700px;
+    margin:auto;
+    color:var(--secondary);
+}
+
+.buttons{
+    margin-top:30px;
+}
+
+.btn{
+    display:inline-block;
+    padding:12px 24px;
+    margin:5px;
+    background:var(--primary);
+    color:white;
+    text-decoration:none;
+    border-radius:12px;
+}
+
+.secondary{
+    background:#30384f;
+}
+
+.section{
+    max-width:1100px;
+    margin:auto;
+    padding:60px 20px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+    margin-top:25px;
+}
+
+.card{
+    background:var(--surface);
+    padding:20px;
+    border-radius:16px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.terminal{
+    margin-top:20px;
+    background:#000;
+    color:#00ff66;
+    padding:20px;
+    border-radius:16px;
+    overflow:auto;
+}
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:var(--secondary);
+}
 ```
+
