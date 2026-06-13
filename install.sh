@@ -3,6 +3,12 @@
 
 pkg install -y dialog 2>/dev/null
 
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Date     : $(date)"
+echo "  Script: install.sh"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
 TERMUX_BIN="/data/data/com.termux/files/usr/bin"
 TX11_BIN="$TERMUX_BIN/tx11start"
 TMP=$(mktemp)

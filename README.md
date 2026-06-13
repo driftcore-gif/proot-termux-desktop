@@ -139,7 +139,7 @@ Proot-termux-desktop/
 ### 1. Install git and clone repo
 ```bash
 pkg install git -y
-git clone https://github.com/driftcore-gif/proot-termux-desktop.git ~/desktop
+git clone https://github.com/driftcore-gif/Debian-termux-desktop.git ~/desktop
 cd ~/desktop
 chmod +x install.sh
 ```
