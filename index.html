@@ -1,86 +1,690 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>proot-termux-desktop</title>
-
-    <meta name="description" content="Linux desktop environments on Android with Termux and PRoot">
-
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proot-termux-desktop</title>
+<meta name="description" content="Full Linux desktop on Android with Termux proot. XFCE, KDE, GNOME and more. No root required.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<nav class="navbar">
-    <h2>🐧 proot-termux-desktop</h2>
+<!-- ── TOP APP BAR ── -->
+<nav class="topbar">
+  <a href="#" class="topbar-brand">
+    <span>🐧</span> proot-termux-desktop
+  </a>
+  <ul class="topbar-nav">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#distros">Distros</a></li>
+    <li><a href="#desktops">Desktops</a></li>
+    <li><a href="#gpu">GPU</a></li>
+    <li><a href="#apps">Apps</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#help">Help</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="topbar-actions">
+    <a href="https://github.com/driftcore-gif/Debian-termux-desktop" target="_blank" class="btn btn-outlined btn-sm">⭐ GitHub</a>
+  </div>
+  <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
 </nav>
 
+<!-- ── HERO ── -->
 <section class="hero">
-    <h1>Linux Desktop on Android</h1>
+  <div class="hero-glow"></div>
 
-    <p>
-        Run Debian, Ubuntu, Arch Linux and desktop environments
-        inside Termux using PRoot. No root required.
-    </p>
+  <div class="hero-chip fade-up">
+    <span>v0.40</span> — Now with dialog TUI installer
+  </div>
 
-    <div class="buttons">
-        <a href="https://github.com/driftcore-gif/proot-termux-desktop" class="btn">
-            GitHub
-        </a>
+  <h1 class="fade-up">
+    <em>Linux Desktop</em><br>on Your Android
+  </h1>
 
-        <a href="#install" class="btn secondary">
-            Install
-        </a>
-    </div>
+  <p class="fade-up">
+    Run full desktop environments inside Termux proot. XFCE, KDE, GNOME and more —
+    with automatic GPU detection, VirGL acceleration, and no root required.
+  </p>
+
+  <div class="hero-buttons fade-up">
+    <a href="#install" class="btn btn-filled">🚀 Get Started</a>
+    <a href="https://github.com/driftcore-gif/Debian-termux-desktop" target="_blank" class="btn btn-tonal">⭐ GitHub</a>
+    <a href="#contact" class="btn btn-outlined">🐛 Report Bug</a>
+  </div>
+
+  <div class="hero-stats fade-up">
+    <div class="hero-stat"><strong>5</strong><small>Distros</small></div>
+    <div class="hero-stat"><strong>8</strong><small>Desktops</small></div>
+    <div class="hero-stat"><strong>6</strong><small>GPU Types</small></div>
+    <div class="hero-stat"><strong>0</strong><small>Root needed</small></div>
+  </div>
 </section>
 
-<section class="section">
-    <h2>Features</h2>
+<hr class="divider">
 
-    <div class="cards">
+<!-- ── FEATURES ── -->
+<section class="section" id="features">
+  <div class="section-label">What you get</div>
+  <h2 class="section-title">Everything in one installer</h2>
+  <p class="section-sub">One command sets up your full Linux desktop — distro, GPU, display, audio and apps all handled automatically.</p>
 
-        <div class="card">
-            <h3>📱 Android</h3>
-            <p>Designed for Android devices.</p>
-        </div>
-
-        <div class="card">
-            <h3>🔒 Rootless</h3>
-            <p>No root access required.</p>
-        </div>
-
-        <div class="card">
-            <h3>🖥 Desktop</h3>
-            <p>XFCE, LXQt, MATE and more.</p>
-        </div>
-
-        <div class="card">
-            <h3>⚡ Fast</h3>
-            <p>Quick setup and deployment.</p>
-        </div>
-<a href="https://info.flagcounter.com/xKv1"><img src="https://s05.flagcounter.com/count/xKv1/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
+  <div class="cards-grid">
+    <div class="card">
+      <span class="card-icon">🔍</span>
+      <h3>Auto GPU Detection</h3>
+      <p>Detects Adreno, Mali, NVIDIA, Intel, and Rockchip automatically. Applies the correct VirGL settings per device.</p>
     </div>
+    <div class="card">
+      <span class="card-icon">⚡</span>
+      <h3>VirGL Acceleration</h3>
+      <p>Hardware-accelerated rendering via virglrenderer-android. Confirmed 150+ FPS on Adreno 610.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🖥️</span>
+      <h3>8 Desktop Environments</h3>
+      <p>XFCE, KDE, GNOME, MATE, LXQt, Openbox, i3wm and Cinnamon. Pick what fits your device RAM.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">📺</span>
+      <h3>TX11 or VNC</h3>
+      <p>Termux:X11 for low-latency local display. VNC for remote access from any viewer app.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎙️</span>
+      <h3>Mic + Audio</h3>
+      <p>PulseAudio bridged from Termux with auto-fallback: sles-source → aaudio-source → basic.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🔒</span>
+      <h3>No Root Required</h3>
+      <p>Runs entirely in proot userspace. Works on unrooted devices with Android 8.0 and above.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🎮</span>
+      <h3>3D Linux Games</h3>
+      <p>SuperTuxKart, Neverball, Freedoom, ExtremeTuxRacer and more — filtered by architecture.</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🍷</span>
+      <h3>Wine + Steam</h3>
+      <p>Run Windows apps via Wine. Steam + Proton available on x86_64 devices. Experimental.</p>
+    </div>
+  </div>
 </section>
 
+<hr class="divider">
+
+<!-- ── DISTROS ── -->
+<section class="section" id="distros">
+  <div class="section-label">Linux Distributions</div>
+  <h2 class="section-title">Choose your distro</h2>
+  <p class="section-sub">All distros get their own setup script using their native package manager — no cross-distro guesswork.</p>
+
+  <table class="m3-table">
+    <thead>
+      <tr>
+        <th>Distro</th>
+        <th>Package Manager</th>
+        <th>Status</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🐧 Debian</td>
+        <td>apt</td>
+        <td><span class="chip success btn-sm">✅ Stable</span></td>
+        <td>Most stable, recommended</td>
+      </tr>
+      <tr>
+        <td>🟠 Ubuntu</td>
+        <td>apt</td>
+        <td><span class="chip success btn-sm">✅ Compatible</span></td>
+        <td>Good package availability</td>
+      </tr>
+      <tr>
+        <td>🔵 Arch Linux</td>
+        <td>pacman</td>
+        <td><span class="chip primary btn-sm">⚡ Cutting edge</span></td>
+        <td>Latest packages, rolling</td>
+      </tr>
+      <tr>
+        <td>🎩 Fedora</td>
+        <td>dnf</td>
+        <td><span class="chip warn btn-sm">⚠️ Heavier</span></td>
+        <td>Modern RHEL-based</td>
+      </tr>
+      <tr>
+        <td>⚫ Void Linux</td>
+        <td>xbps</td>
+        <td><span class="chip warn btn-sm">🚫 Not tested</span></td>
+        <td>Ultra minimal, musl/glibc</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider">
+
+<!-- ── DESKTOPS ── -->
+<section class="section" id="desktops">
+  <div class="section-label">Desktop Environments</div>
+  <h2 class="section-title">Pick your desktop</h2>
+  <p class="section-sub">From ultra-minimal tiling to full-featured environments. Match your device RAM for best performance.</p>
+
+  <table class="m3-table">
+    <thead>
+      <tr>
+        <th>Desktop</th>
+        <th>Idle RAM</th>
+        <th>Weight</th>
+        <th>Best for</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🟩 Openbox</td>
+        <td>~150MB</td>
+        <td><span class="ram-badge ram-low">Very low</span></td>
+        <td>Minimal, fast, right-click menu</td>
+      </tr>
+      <tr>
+        <td>🟩 i3wm</td>
+        <td>~150MB</td>
+        <td><span class="ram-badge ram-low">Very low</span></td>
+        <td>Keyboard-driven tiling WM</td>
+      </tr>
+      <tr>
+        <td>🟩 LXQt</td>
+        <td>~200MB</td>
+        <td><span class="ram-badge ram-low">Low</span></td>
+        <td>Lightweight Qt-based DE</td>
+      </tr>
+      <tr>
+        <td>🟩 XFCE</td>
+        <td>~250MB</td>
+        <td><span class="ram-badge ram-low">Low</span></td>
+        <td>Best all-rounder, recommended</td>
+      </tr>
+      <tr>
+        <td>🟡 MATE</td>
+        <td>~350MB</td>
+        <td><span class="ram-badge ram-mid">Medium</span></td>
+        <td>Classic GNOME 2 feel</td>
+      </tr>
+      <tr>
+        <td>🟡 Cinnamon</td>
+        <td>~450MB</td>
+        <td><span class="ram-badge ram-mid">Medium</span></td>
+        <td>Windows-like layout</td>
+      </tr>
+      <tr>
+        <td>🔴 GNOME</td>
+        <td>~600MB+</td>
+        <td><span class="ram-badge ram-high">High</span></td>
+        <td>Modern UI, 6GB+ RAM only</td>
+      </tr>
+      <tr>
+        <td>🔴 KDE Plasma</td>
+        <td>~700MB+</td>
+        <td><span class="ram-badge ram-high">High</span></td>
+        <td>Feature-rich, 6GB+ RAM only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice warn" style="margin-top:20px;">
+    ⚠️ TS6/TS7 car players and devices with ≤4GB RAM: use XFCE or Openbox only.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── GPU ── -->
+<section class="section" id="gpu">
+  <div class="section-label">GPU Support</div>
+  <h2 class="section-title">Automatic GPU detection</h2>
+  <p class="section-sub">tx11start reads hardware props and applies the right VirGL driver settings. No manual config needed.</p>
+
+  <table class="m3-table">
+    <thead>
+      <tr>
+        <th>GPU</th>
+        <th>Devices</th>
+        <th>Driver</th>
+        <th>GL Version</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Adreno</td>
+        <td>Snapdragon 4xx/6xx/7xx/8xx</td>
+        <td>VirGL + ANGLE</td>
+        <td>4.3 COMPAT</td>
+      </tr>
+      <tr>
+        <td>Mali</td>
+        <td>Exynos / Dimensity / Helio</td>
+        <td>VirGL + ANGLE</td>
+        <td>4.3 COMPAT</td>
+      </tr>
+      <tr>
+        <td>NVIDIA / Tegra</td>
+        <td>Shield / Android x86 NVIDIA</td>
+        <td>VirGL + ANGLE</td>
+        <td>4.6 COMPAT</td>
+      </tr>
+      <tr>
+        <td>Intel IGP</td>
+        <td>Android x86 / BlissOS / PrimeOS</td>
+        <td>VirGL + ANGLE</td>
+        <td>4.6 COMPAT</td>
+      </tr>
+      <tr>
+        <td>Rockchip</td>
+        <td>TS6 / TS7 car players / RK3566/68</td>
+        <td>VirGL + ANGLE</td>
+        <td>3.3 COMPAT</td>
+      </tr>
+      <tr>
+        <td>Generic</td>
+        <td>Unknown / Others</td>
+        <td>VirGL fallback</td>
+        <td>4.0</td>
+      </tr>
+      <tr>
+        <td>No HWA</td>
+        <td>Any</td>
+        <td>llvmpipe</td>
+        <td>Software only</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="notice info" style="margin-top:20px;">
+    💡 Test GPU inside proot: <code style="font-family:monospace;background:rgba(208,188,255,0.1);padding:2px 6px;border-radius:4px;color:var(--md-sys-color-primary);">glxgears</code> — should show 100+ FPS with VirGL working.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── APPS ── -->
+<section class="section" id="apps">
+  <div class="section-label">Optional Apps</div>
+  <h2 class="section-title">Apps installed inside proot</h2>
+  <p class="section-sub">All optional. Selected during proot setup. Architecture-aware — x86_64-only apps skipped on ARM.</p>
+
+  <div class="tabs" id="apps-tabs">
+    <button class="tab active" onclick="switchTab('apps', 'media', this)">🎬 Media</button>
+    <button class="tab" onclick="switchTab('apps', 'photo', this)">🖼️ Photo</button>
+    <button class="tab" onclick="switchTab('apps', 'games', this)">🎮 Games</button>
+    <button class="tab" onclick="switchTab('apps', 'compat', this)">🍷 Compat</button>
+  </div>
+
+  <div id="apps-media" class="tab-panel active">
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">📺</span>
+        <h3>VLC</h3>
+        <p>Plays almost any video/audio format. Supports subtitles, network streams, playlists. All architectures.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <h3>MPV</h3>
+        <p>Lightweight GPU-accelerated player. Terminal and GUI mode. Ideal for lower-end devices.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="apps-photo" class="tab-panel">
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">🖌️</span>
+        <h3>GIMP</h3>
+        <p>Full photo editor with layers, filters, masks and plugins. Photoshop alternative. All architectures.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📷</span>
+        <h3>Darktable</h3>
+        <p>Non-destructive RAW photo processing. Lightroom alternative. Module-based workflow.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="apps-games" class="tab-panel">
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">🏎️</span>
+        <h3>SuperTuxKart</h3>
+        <p>3D kart racing game. All architectures. Works well with VirGL on Adreno and Mali.</p>
+        <div style="margin-top:8px;"><span class="chip success" style="font-size:0.7rem;">All arch</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">⛄</span>
+        <h3>ExtremeTuxRacer</h3>
+        <p>Downhill penguin racing on 3D terrain. All architectures. Good GPU test.</p>
+        <div style="margin-top:8px;"><span class="chip success" style="font-size:0.7rem;">All arch</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏀</span>
+        <h3>Neverball</h3>
+        <p>Tilt the floor to roll a ball through an obstacle course. OpenGL 3D. All architectures.</p>
+        <div style="margin-top:8px;"><span class="chip success" style="font-size:0.7rem;">All arch</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">💀</span>
+        <h3>Freedoom</h3>
+        <p>Free Doom-engine game. Classic FPS. Lightweight and runs great on ARM.</p>
+        <div style="margin-top:8px;"><span class="chip success" style="font-size:0.7rem;">All arch</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔫</span>
+        <h3>Xonotic</h3>
+        <p>Fast-paced open-source FPS with modern graphics. High GPU requirement.</p>
+        <div style="margin-top:8px;"><span class="chip warn" style="font-size:0.7rem;">x86_64 only</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎯</span>
+        <h3>OpenArena</h3>
+        <p>Quake III Arena-like FPS. Open-source, community maps and mods.</p>
+        <div style="margin-top:8px;"><span class="chip warn" style="font-size:0.7rem;">x86_64 only</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="apps-compat" class="tab-panel">
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">🍷</span>
+        <h3>Wine + Winetricks</h3>
+        <p>Run Windows .exe applications inside proot. Requires i386 architecture support. Experimental.</p>
+        <div style="margin-top:8px;"><span class="chip warn" style="font-size:0.7rem;">Experimental</span></div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎮</span>
+        <h3>Steam + Proton</h3>
+        <p>Full Steam client with Proton compatibility layer for Windows games. x86_64 only, needs 4GB+ free storage.</p>
+        <div style="margin-top:8px;"><span class="chip warn" style="font-size:0.7rem;">x86_64 only</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── INSTALL ── -->
 <section class="section" id="install">
-    <h2>Installation</h2>
+  <div class="section-label">Installation</div>
+  <h2 class="section-title">Get running in minutes</h2>
+  <p class="section-sub">Clone the repo, run the installer, follow the on-screen menus. That's it.</p>
 
-    <pre class="terminal">
-pkg update && pkg upgrade 
-pkg install git -y
+  <div class="notice info">
+    📱 Requires Termux from F-Droid (not Play Store) and Termux:X11 app installed on your device.
+  </div>
 
-git clone https://github.com/driftcore-gif/proot-termux-desktop.git
+  <div style="margin-top:20px;">
+    <div class="terminal-wrap">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+        </div>
+        <div class="terminal-title">Termux — install</div>
+        <button class="copy-btn" onclick="copyCode('install-code', this)">Copy</button>
+      </div>
+      <div class="terminal-body" id="install-code">
+<span class="t-comment"># Step 1 — Enable repos and update</span>
+<span class="t-prompt">$ </span><span class="t-cmd">pkg</span> <span class="t-arg">install</span> <span class="t-string">x11-repo root-repo</span>
+<span class="t-prompt">$ </span><span class="t-cmd">pkg</span> <span class="t-arg">update</span> && <span class="t-cmd">pkg</span> <span class="t-arg">upgrade</span>
 
-cd proot-termux-desktop
+<span class="t-comment"># Step 2 — Clone repo</span>
+<span class="t-prompt">$ </span><span class="t-cmd">pkg</span> <span class="t-arg">install</span> <span class="t-string">git -y</span>
+<span class="t-prompt">$ </span><span class="t-cmd">git</span> <span class="t-arg">clone</span> https://github.com/driftcore-gif/Debian-termux-desktop.git <span class="t-string">~/desktop</span>
+<span class="t-prompt">$ </span><span class="t-cmd">cd</span> ~/desktop
 
-bash install.sh
-    </pre>
+<span class="t-comment"># Step 3 — Run installer (interactive dialog menu)</span>
+<span class="t-prompt">$ </span><span class="t-cmd">bash</span> <span class="t-string">install.sh</span>
+
+<span class="t-comment"># Step 4 — Launch anytime</span>
+<span class="t-prompt">$ </span><span class="t-cmd">tx11start</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">What the installer does</h3>
+    <div class="cards-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
+      <div class="card" style="padding:16px;">
+        <strong style="color:var(--md-sys-color-primary);">1</strong>
+        <p style="margin-top:4px;font-size:0.8rem;">Enable x11-repo + root-repo, update package lists</p>
+      </div>
+      <div class="card" style="padding:16px;">
+        <strong style="color:var(--md-sys-color-primary);">2</strong>
+        <p style="margin-top:4px;font-size:0.8rem;">Install Termux deps: proot-distro, termux-x11-nightly, virglrenderer, pulseaudio</p>
+      </div>
+      <div class="card" style="padding:16px;">
+        <strong style="color:var(--md-sys-color-primary);">3</strong>
+        <p style="margin-top:4px;font-size:0.8rem;">Install selected proot distro (Debian/Ubuntu/Arch/Fedora/Void)</p>
+      </div>
+      <div class="card" style="padding:16px;">
+        <strong style="color:var(--md-sys-color-primary);">4</strong>
+        <p style="margin-top:4px;font-size:0.8rem;">Generate tx11start launcher in /usr/bin — available globally</p>
+      </div>
+      <div class="card" style="padding:16px;">
+        <strong style="color:var(--md-sys-color-primary);">5</strong>
+        <p style="margin-top:4px;font-size:0.8rem;">Auto-login to proot and run DISTRO-setup.sh (DE + apps selection)</p>
+      </div>
+    </div>
+  </div>
 </section>
 
-<footer>
-    <p>Made for the Linux-on-Android community 🚀</p>
+<hr class="divider">
+
+<!-- ── HELP / FAQ ── -->
+<section class="section" id="help">
+  <div class="section-label">Help</div>
+  <h2 class="section-title">Frequently asked questions</h2>
+  <p class="section-sub">Common issues and how to fix them.</p>
+
+  <div class="accordion">
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        Why does tx11start show a black screen?
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          Usually caused by xfwm4 compositor conflicting with VirGL. The installer disables it automatically, but if you reset XFCE settings run:<br><br>
+          <code>xfconf-query -c xfwm4 -p /general/use_compositing -s false</code><br><br>
+          Also make sure Termux:X11 app is open before running tx11start.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        glxgears shows very low FPS or fails
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          VirGL may not be running. Check with <code>pgrep virgl_test_server</code>. If empty, restart tx11start. Also verify your GPU was detected correctly — the boot log shows <code>GPU: adreno</code> or similar. If wrong, manually override in tx11start by adding <code>GPU="adreno"</code> near the top.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        Desktop crashes or exits immediately
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          This is usually the Android phantom process killer (Android 12+). Fix it with ADB:<br><br>
+          <code>pkg install android-tools -y</code><br>
+          <code>adb shell "device_config put activity_manager max_phantom_processes 2147483647"</code><br><br>
+          Enable Wireless Debugging in Developer Options first.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        No audio inside proot
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          tx11start tries three PulseAudio modules in order: <code>module-sles-source</code> → <code>module-aaudio-source</code> → basic. If all fail, check that PulseAudio is running in Termux with <code>pulseaudio --check</code>. Make sure <code>PULSE_SERVER=tcp:127.0.0.1</code> is exported inside proot.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        Games not found / package not available
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          Some games (Xonotic, OpenArena) are x86_64 only and automatically skipped on ARM devices. Run <code>dpkg --print-architecture</code> to check your arch. On <code>armhf</code>, use SuperTuxKart, Neverball, Freedoom and ExtremeTuxRacer instead.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        Wine or Steam won't install
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          Wine requires i386 multiarch support: <code>dpkg --add-architecture i386 && apt update</code>. Steam is x86_64 only and won't work on ARM Android devices at all. Both are marked experimental and may have compatibility issues depending on your device.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        Termux says PREFIX is hardcoded at /data/user/0/...
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          Termux is not supported on secondary Android user profiles. Switch to the primary user (User 0) and reinstall Termux from F-Droid. The Play Store version is outdated and will not work correctly.
+        </div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        How do I update after setup?
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          In Termux: <code>cd ~/desktop && git pull</code><br>
+          Inside proot: <code>apt update && apt upgrade</code><br><br>
+          Re-run <code>bash install.sh</code> only if you want to change distro or connection type.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── CONTACT ── -->
+<section class="section" id="contact">
+  <div class="section-label">Contact</div>
+  <h2 class="section-title">Get in touch</h2>
+  <p class="section-sub">Found a bug or have an idea? Send an email and we'll look into it.</p>
+
+  <div class="contact-grid">
+
+    <div class="contact-card">
+      <span class="icon">🐛</span>
+      <h3>Report a Bug</h3>
+      <p>Something broken? Include your device, Android version, GPU type, and the error message. Attach your terminal output if possible.</p>
+      <a href="mailto:jishanshaikh20113@gmail.com?subject=Bug Report — proot-termux-desktop&body=Device:%0AAndroid version:%0AGPU:%0ADistro:%0ADesktop:%0A%0ABug description:%0A%0AError output:%0A"
+         class="btn btn-filled">🐛 Report Bug</a>
+    </div>
+
+    <div class="contact-card">
+      <span class="icon">💡</span>
+      <h3>Request a Feature</h3>
+      <p>Have an idea for a new distro, desktop, app, or improvement? Describe what you'd like to see added or changed.</p>
+      <a href="mailto:jishanshaikh20113@gmail.com?subject=Feature Request — proot-termux-desktop&body=Feature idea:%0A%0AWhy it would be useful:%0A%0AYour device (optional):%0A"
+         class="btn btn-tonal">💡 Request Feature</a>
+    </div>
+
+    <div class="contact-card">
+      <span class="icon">⭐</span>
+      <h3>GitHub</h3>
+      <p>Browse source code, open issues, submit pull requests or star the repo. Contributions are welcome.</p>
+      <a href="https://github.com/driftcore-gif/Debian-termux-desktop" target="_blank"
+         class="btn btn-outlined">⭐ View on GitHub</a>
+    </div>
+
+  </div>
+
+  <div class="notice info" style="margin-top:32px;">
+    📬 Email: <strong>jishanshaikh20113@gmail.com</strong> — Include as much detail as possible for faster responses.
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div style="font-size:1.1rem;font-weight:700;color:var(--md-sys-color-primary);">🐧 proot-termux-desktop</div>
+      <p>Full Linux desktop environments on Android via Termux proot. No root required.</p>
+      <div style="margin-top:16px;">
+        <a href="https://info.flagcounter.com/xKv1"><img src="https://s05.flagcounter.com/count/xKv1/bg_0f0d13/txt_CAC4D0/border_49454f/columns_2/maxflags_6/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0" style="border-radius:8px;max-width:120px;"></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Project</h4>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#help">Help / FAQ</a>
+      <a href="https://github.com/driftcore-gif/Debian-termux-desktop" target="_blank">GitHub</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Distros</h4>
+      <a href="#distros">Debian</a>
+      <a href="#distros">Ubuntu</a>
+      <a href="#distros">Arch Linux</a>
+      <a href="#distros">Fedora</a>
+      <a href="#distros">Void Linux</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="mailto:jishanshaikh20113@gmail.com?subject=Bug Report — proot-termux-desktop">Report Bug</a>
+      <a href="mailto:jishanshaikh20113@gmail.com?subject=Feature Request — proot-termux-desktop">Request Feature</a>
+      <a href="#gpu">GPU Support</a>
+      <a href="#apps">Apps</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 driftcore-gif — MIT License</span>
+    <span>Made for the Linux-on-Android community 🚀</span>
+  </div>
 </footer>
+
+<script src="script.js" defer></script>
 
 </body>
 </html>
