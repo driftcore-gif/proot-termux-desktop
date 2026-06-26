@@ -1,146 +1,179 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# install.sh — Full Termux setup with dialog TUI
+# install.sh — Run this ONCE in Termux to set everything up
+# Usage: bash install.sh
 
-pkg install -y dialog 2>/dev/null
+set -e
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Date     : $(date)"
-echo "  Script: install.sh"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-
+REPO_DIR="$HOME/debian-termux-desktop"
 TERMUX_BIN="/data/data/com.termux/files/usr/bin"
 TX11_BIN="$TERMUX_BIN/tx11start"
-TMP=$(mktemp)
 
-# ─────────────────────────────────────────────
-# Welcome
-# ─────────────────────────────────────────────
-dialog --title "Proot-termux-desktop v0.40" \
-  --msgbox "\nWelcome to Proot-termux-desktop!\n\nThis installer will:\n\n  1. Enable x11-repo + root-repo\n  2. Update package lists\n  3. Install all Termux packages\n  4. Install selected proot distro\n  5. Generate tx11start\n  6. Auto-launch proot setup\n\nPress OK to begin." 18 52
-
-# ─────────────────────────────────────────────
-# Select distro
-# ─────────────────────────────────────────────
-dialog --title "Select Distro" \
-  --menu "\nChoose Linux distribution:" 16 58 5 \
-  "debian"    "✅ Debian      — Most stable, recommended" \
-  "ubuntu"    "✅ Ubuntu      — Good compatibility" \
-  "archlinux" "⚡ Arch Linux  — Cutting edge" \
-  "fedora"    "⚠️  Fedora      — Heavier" \
-  "void"      "🚫 Void        — Not tested" \
-  2>"$TMP"
-
-DISTRO=$(cat "$TMP")
-[[ -z "$DISTRO" ]] && clear && exit 0
-
-# ─────────────────────────────────────────────
-# Select connection
-# ─────────────────────────────────────────────
-dialog --title "Connection Type" \
-  --menu "\nChoose display connection type:" 12 56 2 \
-  "tx11" "Termux:X11 — Fast, low latency (recommended)" \
-  "vnc"  "VNC        — Remote capable, flexible" \
-  2>"$TMP"
-
-CONNECTION=$(cat "$TMP")
-[[ -z "$CONNECTION" ]] && clear && exit 0
-
-# ─────────────────────────────────────────────
-# Confirm
-# ─────────────────────────────────────────────
-dialog --title "Confirm Setup" \
-  --yesno "\nConfiguration:\n\n  Distro     : $DISTRO\n  Connection : $CONNECTION\n\nProceed?" 12 48
-
-[[ $? -ne 0 ]] && clear && exit 0
-clear
-
-# ─────────────────────────────────────────────
-# Step 1 — Enable repos FIRST then update
-# ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Step 1/5 — Enabling repos"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📦 Installing x11-repo..."
-pkg install -y x11-repo
-echo "📦 Installing root-repo..."
-pkg install -y root-repo
-echo "📦 Updating package lists..."
-pkg update -y
-echo "✅ Repos enabled and updated"
+echo ""
+echo "╔══════════════════════════════════════╗"
+echo "║     debian-termux-desktop setup      ║"
+echo "╚══════════════════════════════════════╝"
 echo ""
 
 # ─────────────────────────────────────────────
-# Step 2 — Install all packages
+# Step 1 — Install Termux packages
 # ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Step 2/5 — Installing Termux packages"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "📦 [1/5] Installing Termux packages..."
+pkg update -y && pkg upgrade -y
+pkg install proot-distro
+pkg install termux-x11-nightly
+pkg install virglrenderer-android
+pkg install pulseaudio
+pkg install wget
+pkg install curl
+pkg install git
 
-echo "📦 Installing proot-distro..."
-pkg install -y proot-distro
 
-echo "📦 Installing termux-x11-nightly..."
-pkg install -y termux-x11-nightly
+echo "✅ Termux packages installed"
+echo ""
 
-echo "📦 Installing virglrenderer-android..."
-pkg install -y virglrenderer-android
+# ─────────────────────────────────────────────
+# Step 2 — Ask distro
+# ─────────────────────────────────────────────
+echo "🐧 [2/5] Select distro:"
+echo "  1) Debian (recommended)"
+echo "  2) Ubuntu"
+echo "  3) Arch Linux"
+echo "  4) Fedora"
+read -r -p "Enter number [1]: " distro_num
+distro_num="${distro_num:-1}"
 
-echo "📦 Installing pulseaudio..."
-pkg install -y pulseaudio
+case "$distro_num" in
+  1) DISTRO="debian" ;;
+  2) DISTRO="ubuntu" ;;
+  3) DISTRO="archlinux" ;;
+  4) DISTRO="fedora" ;;
+  *) DISTRO="debian" ;;
+esac
+echo "✅ Distro: $DISTRO"
+echo ""
 
-echo "📦 Installing wget curl git..."
-pkg install -y wget curl git
+# ─────────────────────────────────────────────
+# Step 3 — Ask DE
+# ─────────────────────────────────────────────
+echo "🖥️  [3/5] Select desktop environment:"
+echo "  1) XFCE      (recommended — lightweight)"
+echo "  2) KDE       (heavy — 6GB+ RAM)"
+echo "  3) GNOME     (heavy — 6GB+ RAM)"
+echo "  4) MATE      (medium)"
+echo "  5) LXQt      (lightweight)"
+echo "  6) Openbox   (minimal)"
+echo "  7) i3wm      (tiling)"
+echo "  8) Cinnamon  (Windows-like)"
+read -r -p "Enter number [1]: " de_num
+de_num="${de_num:-1}"
 
+case "$de_num" in
+  1) DE="xfce" ;;
+  2) DE="kde" ;;
+  3) DE="gnome" ;;
+  4) DE="mate" ;;
+  5) DE="lxqt" ;;
+  6) DE="openbox" ;;
+  7) DE="i3wm" ;;
+  8) DE="cinnamon" ;;
+  *) DE="xfce" ;;
+esac
+echo "✅ DE: $DE"
+echo ""
+
+# ─────────────────────────────────────────────
+# Step 4 — Ask connection type
+# ─────────────────────────────────────────────
+echo "📺 [4/5] Select connection type:"
+echo "  1) Termux:X11 (recommended — low latency)"
+echo "  2) VNC        (flexible — any VNC viewer)"
+read -r -p "Enter number [1]: " conn_num
+conn_num="${conn_num:-1}"
+
+case "$conn_num" in
+  1) CONNECTION="tx11" ;;
+  2) CONNECTION="vnc" ;;
+  *) CONNECTION="tx11" ;;
+esac
+echo "✅ Connection: $CONNECTION"
+echo ""
+
+# Install tigervnc if VNC selected
 if [[ "$CONNECTION" == "vnc" ]]; then
-  echo "📦 Installing tigervnc..."
-  pkg install -y tigervnc
+  pkg install tigervnc -y
 fi
 
-echo "✅ All Termux packages installed"
+# ─────────────────────────────────────────────
+# Step 5 — Ask optional apps
+# ─────────────────────────────────────────────
+echo "📦 [5/5] Optional apps:"
+read -r -p "  Install Wine? (experimental) [y/N]: " wine_ans
+read -r -p "  Install media players (VLC + MPV)? [Y/n]: " media_ans
+read -r -p "  Install photo editors (GIMP + Darktable)? [Y/n]: " photo_ans
+
+INSTALL_WINE="false"
+INSTALL_MEDIA="true"
+INSTALL_PHOTO="true"
+
+[[ "${wine_ans,,}" == "y" ]] && INSTALL_WINE="true"
+[[ "${media_ans,,}" == "n" ]] && INSTALL_MEDIA="false"
+[[ "${photo_ans,,}" == "n" ]] && INSTALL_PHOTO="false"
+
 echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Distro    : $DISTRO"
+echo "  DE        : $DE"
+echo "  Connection: $CONNECTION"
+echo "  Wine      : $INSTALL_WINE"
+echo "  Media     : $INSTALL_MEDIA"
+echo "  Photo     : $INSTALL_PHOTO"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+read -r -p "Proceed? [Y/n]: " confirm
+[[ "${confirm,,}" == "n" ]] && echo "Aborted." && exit 0
 
 # ─────────────────────────────────────────────
-# Step 3 — Install proot distro
+# Install distro
 # ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Step 3/5 — Installing $DISTRO proot"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-proot-distro install "$DISTRO" || echo "⚠️ Already installed or failed"
-echo "✅ $DISTRO ready"
 echo ""
+echo "🐧 Installing $DISTRO proot..."
+proot-distro install "$DISTRO" 2>/dev/null || echo "Already installed"
 
 # ─────────────────────────────────────────────
-# Step 4 — Generate tx11start
+# Generate tx11start with user choices
 # ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Step 4/5 — Generating tx11start"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "⚙️  Generating tx11start..."
 
 cat > "$TX11_BIN" << SCRIPT
 #!/data/data/com.termux/files/usr/bin/bash
-CONNECTION="${CONNECTION}"
+# tx11start — Auto-generated by debian-termux-desktop installer
+
 DISTRO="${DISTRO}"
+DE="${DE}"
+CONNECTION="${CONNECTION}"
 VNC_PORT="5901"
 VNC_DISPLAY=":1"
 
+echo "🚀 Booting \$DISTRO + \$DE (\$CONNECTION)..."
+
 detect_gpu() {
-  local egl hw renderer
-  egl=\$(getprop ro.hardware.egl 2>/dev/null | tr '[:upper:]' '[:lower:]')
-  hw=\$(cat /proc/cpuinfo 2>/dev/null | grep -i "hardware" | tr '[:upper:]' '[:lower:]')
-  renderer=\$(getprop ro.hardware 2>/dev/null | tr '[:upper:]' '[:lower:]')
-  if echo "\$egl \$hw \$renderer" | grep -qi "nvidia\|tegra"; then echo "nvidia"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "intel\|i915\|iris"; then echo "intel"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "rockchip\|rk3"; then echo "rockchip"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "adreno\|qcom\|qualcomm\|snapdragon"; then echo "adreno"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "mali\|exynos\|mediatek\|dimensity\|helio"; then echo "mali"
-  elif echo "\$hw" | grep -qi "x86\|x86_64"; then echo "intel"
-  else echo "others"
+  local gpu
+  gpu=\$(getprop ro.hardware.egl 2>/dev/null | tr '[:upper:]' '[:lower:]')
+  if echo "\$gpu" | grep -qi "adreno"; then echo "adreno"
+  elif echo "\$gpu" | grep -qi "mali"; then echo "mali"
+  else
+    local hw
+    hw=\$(cat /proc/cpuinfo 2>/dev/null | grep -i "hardware" | tr '[:upper:]' '[:lower:]')
+    if echo "\$hw" | grep -qi "qcom\|qualcomm\|snapdragon"; then echo "adreno"
+    elif echo "\$hw" | grep -qi "mali\|exynos\|mediatek\|dimensity\|helio"; then echo "mali"
+    else echo "others"
+    fi
   fi
 }
 
 GPU=\$(detect_gpu)
-echo "🚀 Booting (GPU: \$GPU | Distro: \$DISTRO)..."
+echo "🔍 GPU: \$GPU"
 
 pkill -f virgl_test_server 2>/dev/null
 pkill -f termux-x11 2>/dev/null
@@ -148,67 +181,50 @@ pkill -f Xvnc 2>/dev/null
 sleep 1
 
 case "\$GPU" in
-  "nvidia")
-    MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.6COMPAT MESA_GLES_VERSION_OVERRIDE=3.2 \
-    GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.6COMPAT; export mesa_glthread=true"
-    ;;
-  "intel")
-    MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.6COMPAT MESA_GLES_VERSION_OVERRIDE=3.2 \
-    GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.6COMPAT; export mesa_glthread=true"
-    ;;
-  "rockchip")
-    MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=3.3COMPAT MESA_GLES_VERSION_OVERRIDE=3.1 \
-    GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=3.3COMPAT; export mesa_glthread=true"
-    ;;
   "adreno")
     MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.3COMPAT MESA_GLES_VERSION_OVERRIDE=3.2 \
-    MESA_EXTENSION_OVERRIDE="+GL_EXT_shader_texture_lod" GALLIUM_DRIVER=virpipe \
-    virgl_test_server_android --angle-gl &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.3COMPAT; export mesa_glthread=true"
+    MESA_GLSL_VERSION_OVERRIDE=430 MESA_EXTENSION_OVERRIDE="+GL_EXT_shader_texture_lod" \
+    GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
+    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.3COMPAT; export MESA_GLES_VERSION_OVERRIDE=3.2; export LIBGL_DRI3_DISABLE=1; export mesa_glthread=true; export vblank_mode=0"
     ;;
   "mali")
     MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.3COMPAT MESA_GLES_VERSION_OVERRIDE=3.2 \
     GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.3COMPAT; export mesa_glthread=true"
+    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.3COMPAT; export MESA_GLES_VERSION_OVERRIDE=3.2; export MESA_VK_WSI_PRESENT_MODE=mailbox; export MESA_VK_WSI_DEBUG=blit; export LIBGL_DRI3_DISABLE=1; export mesa_glthread=true; export vblank_mode=0"
     ;;
   *)
     MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.0 GALLIUM_DRIVER=virpipe virgl_test_server_android &
-    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.0; export mesa_glthread=true"
+    GPU_ENV="export GALLIUM_DRIVER=virpipe; export MESA_NO_ERROR=1; export MESA_GL_VERSION_OVERRIDE=4.0; export MESA_GLES_VERSION_OVERRIDE=3.2; export mesa_glthread=true"
     ;;
 esac
 sleep 1
 
-echo "🎙️ Audio..."
+echo "🎙️ Setting up Audio..."
 pulseaudio --kill 2>/dev/null; sleep 1
-pulseaudio --start \
-  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
-  --load="module-sles-source" --exit-idle-time=-1 2>/dev/null || \
-pulseaudio --start \
-  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
-  --load="module-aaudio-source" --exit-idle-time=-1 2>/dev/null || \
-pulseaudio --start \
-  --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
-  --exit-idle-time=-1 2>/dev/null
+if pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --load="module-sles-source" --exit-idle-time=-1 2>/dev/null; then
+  echo "✅ Audio ready (sles)"
+elif pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --load="module-aaudio-source" --exit-idle-time=-1 2>/dev/null; then
+  echo "✅ Audio ready (aaudio)"
+else
+  pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --exit-idle-time=-1 2>/dev/null
+  echo "⚠️ Audio started (no mic)"
+fi
 sleep 1
 
 if [[ "\$CONNECTION" == "tx11" ]]; then
+  echo "📺 Launching Termux:X11..."
   am start --user 0 -n com.termux.x11/com.termux.x11.MainActivity 2>/dev/null
   sleep 2
   termux-x11 :0 -ac &
   sleep 2
   DISPLAY_VAR=":0"
-else
+elif [[ "\$CONNECTION" == "vnc" ]]; then
+  echo "🖥️ Starting VNC on port \$VNC_PORT..."
   vncserver \$VNC_DISPLAY -geometry 1280x720 -depth 24 2>/dev/null
   sleep 2
   DISPLAY_VAR="\$VNC_DISPLAY"
   echo "📱 Connect VNC to: localhost:\$VNC_PORT"
 fi
-
-DE="xfce"
-[[ -f ~/.proot-de ]] && DE=\$(cat ~/.proot-de)
 
 case "\$DE" in
   "xfce")     DE_CMD="startxfce4" ;;
@@ -222,6 +238,7 @@ case "\$DE" in
   *)          DE_CMD="startxfce4" ;;
 esac
 
+echo "🐧 Launching \$DISTRO + \$DE..."
 proot-distro login "\$DISTRO" --shared-tmp -- bash -c "
   export DISPLAY=\${DISPLAY_VAR}
   export PULSE_SERVER=tcp:127.0.0.1
@@ -231,42 +248,108 @@ proot-distro login "\$DISTRO" --shared-tmp -- bash -c "
   mkdir -p /run/dbus
   dbus-daemon --system --fork 2>/dev/null || true
   sleep 1
-  [ -z \"\\\$DBUS_SESSION_BUS_ADDRESS\" ] && eval \\\$(dbus-launch --sh-syntax)
-  export DBUS_SESSION_BUS_ADDRESS
+  if [ -z \"\\\$DBUS_SESSION_BUS_ADDRESS\" ]; then
+    eval \\\$(dbus-launch --sh-syntax)
+    export DBUS_SESSION_BUS_ADDRESS
+  fi
   xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null
-  echo \"🎮 Ready (GPU: \${GPU})\"
+  echo \"🎮 Ready (GPU: \${GPU} | DE: \${DE})\"
   \${DE_CMD}
 "
 SCRIPT
 
 chmod +x "$TX11_BIN"
 echo "✅ tx11start installed to $TX11_BIN"
-echo ""
 
 # ─────────────────────────────────────────────
-# Step 5 — Auto-login proot
+# Generate debian-setup.sh with user choices
 # ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Step 5/5 — Launching $DISTRO proot"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🐧 Auto-logging into $DISTRO..."
-echo "📦 Will run: ~/desktop/setup/${DISTRO}-setup.sh"
 echo ""
-sleep 2
+echo "⚙️  Generating proot setup script..."
 
-rm -f "$TMP"
+cat > "$REPO_DIR/setup/run-inside-proot.sh" << PSCRIPT
+#!/bin/bash
+# Run inside proot: proot-distro login ${DISTRO} --shared-tmp
+# Then: bash ~/desktop/setup/run-inside-proot.sh
 
-proot-distro login "$DISTRO" --shared-tmp -- bash -c "
-  if [ -f ~/desktop/setup/${DISTRO}-setup.sh ]; then
-    bash ~/desktop/setup/${DISTRO}-setup.sh
-  else
-    echo '⚠️  Setup file not found!'
-    echo '👉 Clone repo first:'
-    echo '   git clone https://github.com/driftcore-gif/Debian-termux-desktop.git ~/desktop'
-    echo '   bash ~/desktop/install.sh'
-    bash
-  fi
-"
+DE="${DE}"
+INSTALL_WINE="${INSTALL_WINE}"
+INSTALL_MEDIA="${INSTALL_MEDIA}"
+INSTALL_PHOTO="${INSTALL_PHOTO}"
+
+echo "📦 Updating system..."
+apt update -y && apt upgrade -y
+
+echo "🔧 Installing base tools..."
+apt install -y dbus dbus-x11 wget curl git nano \
+  mesa-utils libgl1-mesa-dri libvulkan1 \
+  gtk2-engines-murrine gtk2-engines-pixbuf \
+  greybird-gtk-theme
+
+echo "🖥️ Installing \$DE..."
+case "\$DE" in
+  "xfce")     apt install -y xfce4 xfce4-goodies xfce4-terminal xfce4-whiskermenu-plugin thunar ;;
+  "kde")      apt install -y kde-plasma-desktop konsole dolphin ;;
+  "gnome")    apt install -y gnome-shell gnome-terminal nautilus gnome-tweaks ;;
+  "mate")     apt install -y mate-desktop-environment mate-terminal caja ;;
+  "lxqt")     apt install -y lxqt lxterminal pcmanfm-qt ;;
+  "openbox")  apt install -y openbox obconf tint2 lxterminal pcmanfm ;;
+  "i3wm")     apt install -y i3 i3status dmenu lxterminal ;;
+  "cinnamon") apt install -y cinnamon cinnamon-core gnome-terminal nemo ;;
+esac
+
+[[ "\$INSTALL_MEDIA" == "true" ]] && apt install -y vlc mpv && echo "✅ Media players installed"
+[[ "\$INSTALL_PHOTO" == "true" ]] && apt install -y gimp darktable && echo "✅ Photo editors installed"
+
+if [[ "\$INSTALL_WINE" == "true" ]]; then
+  dpkg --add-architecture i386 && apt update
+  apt install -y wine wine64 wine32 winetricks || echo "⚠️ Wine failed"
+fi
+
+cat >> ~/.bashrc << 'EOF'
+
+export DISPLAY=:0
+export PULSE_SERVER=tcp:127.0.0.1
+export WINEDEBUG=-all
+export mesa_glthread=true
+export MESA_NO_ERROR=1
+
+if [ -z "\$DBUS_SESSION_BUS_ADDRESS" ]; then
+  eval \$(dbus-launch --sh-syntax)
+  export DBUS_SESSION_BUS_ADDRESS
+fi
+echo "🎮 Proot env loaded"
+EOF
+
+source ~/.bashrc
+eval \$(dbus-launch --sh-syntax) 2>/dev/null
+
+if [[ "\$DE" == "xfce" ]]; then
+  xfconf-query -c xsettings -p /Net/ThemeName -s "Greybird" 2>/dev/null
+  xfconf-query -c xfwm4 -p /general/theme -s "Greybird" 2>/dev/null
+  xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null
+  xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/Super_L" -n -t string -s "xfce4-popup-whiskermenu" 2>/dev/null
+fi
 
 echo ""
-echo "✅ All done! Run: tx11start"
+echo "✅ Proot setup complete!"
+echo "👉 Exit proot and run: tx11start"
+PSCRIPT
+
+chmod +x "$REPO_DIR/setup/run-inside-proot.sh"
+echo "✅ Proot setup script generated"
+
+# ─────────────────────────────────────────────
+# Final instructions
+# ─────────────────────────────────────────────
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ Installation complete!"
+echo ""
+echo "👉 Next step — run inside proot:"
+echo "   proot-distro login $DISTRO --shared-tmp"
+echo "   bash ~/desktop/setup/run-inside-proot.sh"
+echo ""
+echo "👉 Then launch anytime with:"
+echo "   tx11start"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

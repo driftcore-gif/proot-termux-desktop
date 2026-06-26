@@ -1,105 +1,35 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# install.sh — Termux side setup with dialog TUI
+# tx11start — Universal Launcher (auto GPU detection)
 
-# Install dialog first
-pkg install -y dialog 2>/dev/null
-
-TERMUX_BIN="/data/data/com.termux/files/usr/bin"
-TX11_BIN="$TERMUX_BIN/tx11start"
-TMP=$(mktemp)
-
-# ─────────────────────────────────────────────
-# Welcome
-# ─────────────────────────────────────────────
-dialog --title "Proot-termux-desktop v0.40" \
-  --msgbox "\nWelcome to Proot-termux-desktop!\n\nThis will install:\n  - Termux dependencies\n  - proot-distro\n  - tx11start launcher\n\nApp installation happens inside proot." 14 50
-
-# ─────────────────────────────────────────────
-# Install Termux packages
-# ─────────────────────────────────────────────
-dialog --title "Installing" --infobox "\nInstalling Termux packages...\n\nPlease wait." 7 40
-pkg update -y > /dev/null 2>&1
-pkg install -y proot-distro termux-x11-nightly virglrenderer-android pulseaudio wget curl git > /dev/null 2>&1
-
-# ─────────────────────────────────────────────
-# Select distro
-# ─────────────────────────────────────────────
-dialog --title "Select Distro" \
-  --menu "\nChoose Linux distribution to install:" 16 55 5 \
-  "debian"     "✅ Debian      — Most stable, recommended" \
-  "ubuntu"     "✅ Ubuntu      — Good compatibility" \
-  "archlinux"  "⚡ Arch Linux  — Cutting edge" \
-  "fedora"     "⚠️  Fedora      — Heavier" \
-  "void"       "🚫 Void        — Not tested" \
-  2>"$TMP"
-
-DISTRO=$(cat "$TMP")
-[[ -z "$DISTRO" ]] && dialog --msgbox "Cancelled." 5 20 && rm -f "$TMP" && exit 0
-
-# ─────────────────────────────────────────────
-# Select connection type
-# ─────────────────────────────────────────────
-dialog --title "Connection Type" \
-  --menu "\nChoose display connection type:" 12 55 2 \
-  "tx11" "Termux:X11 — Fast, low latency (recommended)" \
-  "vnc"  "VNC        — Remote capable, flexible" \
-  2>"$TMP"
-
-CONNECTION=$(cat "$TMP")
-[[ -z "$CONNECTION" ]] && dialog --msgbox "Cancelled." 5 20 && rm -f "$TMP" && exit 0
-
-[[ "$CONNECTION" == "vnc" ]] && pkg install -y tigervnc > /dev/null 2>&1
-
-# ─────────────────────────────────────────────
-# Confirm
-# ─────────────────────────────────────────────
-dialog --title "Confirm" \
-  --yesno "\nConfiguration:\n\n  Distro     : $DISTRO\n  Connection : $CONNECTION\n\nProceed?" 12 45
-
-[[ $? -ne 0 ]] && dialog --msgbox "Aborted." 5 20 && rm -f "$TMP" && exit 0
-
-# ─────────────────────────────────────────────
-# Install proot distro
-# ─────────────────────────────────────────────
-dialog --title "Installing" --infobox "\nInstalling $DISTRO proot...\n\nThis may take a while." 8 45
-proot-distro install "$DISTRO" > /dev/null 2>&1 || true
-
-# ─────────────────────────────────────────────
-# Generate tx11start
-# ─────────────────────────────────────────────
-dialog --title "Generating" --infobox "\nGenerating tx11start..." 6 40
-
-cat > "$TX11_BIN" << SCRIPT
-#!/data/data/com.termux/files/usr/bin/bash
-CONNECTION="${CONNECTION}"
-DISTRO="${DISTRO}"
+CONNECTION="tx11"  # tx11 | vnc — set by install.sh
+DISTRO="debian"    # set by install.sh
 VNC_PORT="5901"
 VNC_DISPLAY=":1"
 
 detect_gpu() {
   local egl hw renderer
-  egl=\$(getprop ro.hardware.egl 2>/dev/null | tr '[:upper:]' '[:lower:]')
-  hw=\$(cat /proc/cpuinfo 2>/dev/null | grep -i "hardware" | tr '[:upper:]' '[:lower:]')
-  renderer=\$(getprop ro.hardware 2>/dev/null | tr '[:upper:]' '[:lower:]')
-  if echo "\$egl \$hw \$renderer" | grep -qi "nvidia\|tegra"; then echo "nvidia"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "intel\|i915\|iris"; then echo "intel"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "rockchip\|rk3"; then echo "rockchip"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "adreno\|qcom\|qualcomm\|snapdragon"; then echo "adreno"
-  elif echo "\$egl \$hw \$renderer" | grep -qi "mali\|exynos\|mediatek\|dimensity\|helio"; then echo "mali"
-  elif echo "\$hw" | grep -qi "x86\|x86_64"; then echo "intel"
+  egl=$(getprop ro.hardware.egl 2>/dev/null | tr '[:upper:]' '[:lower:]')
+  hw=$(cat /proc/cpuinfo 2>/dev/null | grep -i "hardware" | tr '[:upper:]' '[:lower:]')
+  renderer=$(getprop ro.hardware 2>/dev/null | tr '[:upper:]' '[:lower:]')
+  if echo "$egl $hw $renderer" | grep -qi "nvidia\|tegra"; then echo "nvidia"
+  elif echo "$egl $hw $renderer" | grep -qi "intel\|i915\|iris"; then echo "intel"
+  elif echo "$egl $hw $renderer" | grep -qi "rockchip\|rk3"; then echo "rockchip"
+  elif echo "$egl $hw $renderer" | grep -qi "adreno\|qcom\|qualcomm\|snapdragon"; then echo "adreno"
+  elif echo "$egl $hw $renderer" | grep -qi "mali\|exynos\|mediatek\|dimensity\|helio"; then echo "mali"
+  elif echo "$hw" | grep -qi "x86\|x86_64"; then echo "intel"
   else echo "others"
   fi
 }
 
-GPU=\$(detect_gpu)
-echo "🚀 Booting (GPU: \$GPU | Distro: \$DISTRO)..."
+GPU=$(detect_gpu)
+echo "🚀 Booting $DISTRO (GPU: $GPU | Connection: $CONNECTION)..."
 
 pkill -f virgl_test_server 2>/dev/null
 pkill -f termux-x11 2>/dev/null
 pkill -f Xvnc 2>/dev/null
 sleep 1
 
-case "\$GPU" in
+case "$GPU" in
   "nvidia")
     MESA_NO_ERROR=1 MESA_GL_VERSION_OVERRIDE=4.6COMPAT MESA_GLES_VERSION_OVERRIDE=3.2 \
     GALLIUM_DRIVER=virpipe virgl_test_server_android --angle-gl &
@@ -139,26 +69,24 @@ pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth
   --load="module-sles-source" --exit-idle-time=-1 2>/dev/null || \
 pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
   --load="module-aaudio-source" --exit-idle-time=-1 2>/dev/null || \
-pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" --exit-idle-time=-1 2>/dev/null
+pulseaudio --start --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" \
+  --exit-idle-time=-1 2>/dev/null
 sleep 1
 
-if [[ "\$CONNECTION" == "tx11" ]]; then
+if [[ "$CONNECTION" == "tx11" ]]; then
   am start --user 0 -n com.termux.x11/com.termux.x11.MainActivity 2>/dev/null
-  sleep 2
-  termux-x11 :0 -ac &
-  sleep 2
+  sleep 2; termux-x11 :0 -ac &; sleep 2
   DISPLAY_VAR=":0"
 else
-  vncserver \$VNC_DISPLAY -geometry 1280x720 -depth 24 2>/dev/null
-  sleep 2
-  DISPLAY_VAR="\$VNC_DISPLAY"
-  echo "📱 Connect VNC to: localhost:\$VNC_PORT"
+  vncserver $VNC_DISPLAY -geometry 1280x720 -depth 24 2>/dev/null
+  sleep 2; DISPLAY_VAR="$VNC_DISPLAY"
+  echo "📱 Connect VNC to: localhost:$VNC_PORT"
 fi
 
 DE="xfce"
-[[ -f ~/.proot-de ]] && DE=\$(cat ~/.proot-de)
+[[ -f ~/.proot-de ]] && DE=$(cat ~/.proot-de)
 
-case "\$DE" in
+case "$DE" in
   "xfce")     DE_CMD="startxfce4" ;;
   "kde")      DE_CMD="startplasma-x11" ;;
   "gnome")    DE_CMD="gnome-session" ;;
@@ -170,30 +98,18 @@ case "\$DE" in
   *)          DE_CMD="startxfce4" ;;
 esac
 
-proot-distro login "\$DISTRO" --shared-tmp -- bash -c "
-  export DISPLAY=\${DISPLAY_VAR}
+proot-distro login "$DISTRO" --shared-tmp -- bash -c "
+  export DISPLAY=${DISPLAY_VAR}
   export PULSE_SERVER=tcp:127.0.0.1
   export WINEDEBUG=-all
   export WINEPREFIX=~/.wine
-  \${GPU_ENV}
+  ${GPU_ENV}
   mkdir -p /run/dbus
   dbus-daemon --system --fork 2>/dev/null || true
   sleep 1
-  [ -z \"\\\$DBUS_SESSION_BUS_ADDRESS\" ] && eval \\\$(dbus-launch --sh-syntax)
+  [ -z \"\$DBUS_SESSION_BUS_ADDRESS\" ] && eval \$(dbus-launch --sh-syntax)
   export DBUS_SESSION_BUS_ADDRESS
   xfconf-query -c xfwm4 -p /general/use_compositing -s false 2>/dev/null
-  echo \"🎮 Ready (GPU: \${GPU})\"
-  \${DE_CMD}
+  echo \"🎮 Ready (GPU: ${GPU} | DE: ${DE})\"
+  ${DE_CMD}
 "
-SCRIPT
-
-chmod +x "$TX11_BIN"
-rm -f "$TMP"
-
-# ─────────────────────────────────────────────
-# Done
-# ─────────────────────────────────────────────
-dialog --title "✅ Done!" \
-  --msgbox "\nTermux setup complete!\n\nNext steps:\n\n  1. proot-distro login $DISTRO --shared-tmp\n\n  2. bash ~/desktop/setup/${DISTRO}-setup.sh\n\n  3. exit\n\n  4. tx11start" 18 55
-
-clear
