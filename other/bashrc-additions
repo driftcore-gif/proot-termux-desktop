@@ -1,3 +1,6 @@
--e export DISPLAY=:0
+export DISPLAY=:0
 export PULSE_SERVER=tcp:127.0.0.1
+export WINEDEBUG=-all
 export mesa_glthread=true
+export MESA_NO_ERROR=1
+[ -z "$DBUS_SESSION_BUS_ADDRESS" ] && eval $(dbus-launch --sh-syntax) && export DBUS_SESSION_BUS_ADDRESS
